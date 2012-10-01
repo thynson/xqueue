@@ -150,16 +150,16 @@ namespace xq
       // Update the value of given position
       void update(position_t &pos, const Type &value)
       {
-        if (m_comparer(value, pos.m_container->first))
+        iterator origin = m_container.begin() + pos.m_offset;
+        if (m_comparer.m_comparer(value, origin->first))
         {
-          pos.m_container->first = value;
-          push_heap(m_container.begin(), pos.m_container + 1);
+          origin->first = value;
+          push_heap(m_container.begin(), origin + 1);
         }
-        else
+        else if (m_comparer.m_comparer(origin->first, value))
         {
-          iterator p = m_container.begin() + pos.m_offset;
-          pos.m_container->first = value;
-          adjust_heap(m_container.begin(), m_container.end(), p);
+          origin->first = value;
+          adjust_heap(m_container.begin(), m_container.end(), origin);
         }
       }
 
