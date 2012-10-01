@@ -5,6 +5,7 @@
 #include <functional> // For std::less
 #include <utility>    // For std::pair
 #include <vector>     // For std::vector
+#include <stdexcept>  // For std::range_error and std::underflow_error
 
 namespace xpq
 {
@@ -72,6 +73,7 @@ namespace xpq
       typedef std::pair<Type, position_t*> Element;
     public:
       typedef Container<Element, Allocator<Element> > container;
+      typedef typename container::size_type size_type;
 
       xqueue()
         : m_container()
@@ -80,6 +82,11 @@ namespace xpq
 
       ~xqueue()
       { }
+
+      size_type size()
+      {
+        return m_container.size();
+      }
 
       // Push a value into queue and return its position
       void push(const Type &value, position_t &pos)
@@ -92,6 +99,8 @@ namespace xpq
       // Return first one in the queue
       position_t &front()
       {
+        if (!size())
+          throw std::underflow_error("Queue is empty");
         return *m_container.begin()->second;
       }
 
@@ -99,6 +108,10 @@ namespace xpq
       Type remove(position_t &p)
       {
         iterator pos = m_container.begin() + p.m_offset;
+
+        if (!check_range(m_container.begin(), m_container.end(), pos))
+          throw std::range_error("Position invalid");
+
         pop_heap(m_container.begin(), m_container.end(), pos);
         Type ret = pos->first;
         p.m_offset = -1;
@@ -142,6 +155,12 @@ namespace xpq
         return std::move(value);
       }
 #endif
+
+      bool check_range(iterator begin, iterator end, iterator pos)
+      {
+        return begin <= pos && pos < end;
+      }
+
 
       void adjust_heap(iterator begin, iterator end, iterator pos)
       {
