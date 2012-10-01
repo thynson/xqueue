@@ -22,7 +22,7 @@
 #include <vector>     // For std::vector
 #include <stdexcept>  // For std::range_error and std::underflow_error
 
-namespace xpq
+namespace xq
 {
   // Forward declarations
 
