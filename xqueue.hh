@@ -151,6 +151,9 @@ namespace xq
       void update(position_t &pos, const Type &value)
       {
         iterator origin = m_container.begin() + pos.m_offset;
+
+        // m_comparer compares Element, while m_comparer.m_comparer
+        // compares Type
         if (m_comparer.m_comparer(value, origin->first))
         {
           origin->first = value;
@@ -161,6 +164,7 @@ namespace xq
           origin->first = value;
           adjust_heap(m_container.begin(), m_container.end(), origin);
         }
+        // else new value is equals to origin
       }
 
     private:
@@ -249,6 +253,7 @@ namespace xq
         last->second->m_offset = last - begin;
       }
 
+      // Wrap Type comparer as Element comparer
       struct comparer_t
       {
         Comparer m_comparer;
