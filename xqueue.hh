@@ -40,7 +40,7 @@ namespace xpq
 
     public:
       position()
-        : m_position()
+        : m_offset()
       { }
 
       ~position()
@@ -49,9 +49,10 @@ namespace xpq
     public:
 
       typedef typename Queue::container container;
+      typedef typename container::difference_type difference_type;
       typedef typename container::iterator iterator;
 
-      iterator m_position;
+      difference_type m_offset;
     };
 
 
@@ -83,8 +84,8 @@ namespace xpq
       // Push a value into queue and return its position
       void push(const Type &value, position_t &pos)
       {
-        pos.m_position = m_container.insert(m_container.end(),
-                                            make_pair(value, &pos));
+        pos.m_offset = m_container.insert(m_container.end(),
+                       make_pair(value, &pos)) - m_container.begin();
         push_heap(m_container.begin(), m_container.end());
       }
 
@@ -97,9 +98,10 @@ namespace xpq
       // Extract a value for a given position, and remove it from the queue
       Type remove(position_t &p)
       {
-        heap_pop(m_container.begin(), m_container.end(), p.m_position);
-        Type ret = p.m_position->first;
-        p.m_position = m_container.end();
+        iterator pos = m_container.begin() + p.m_offset;
+        pop_heap(m_container.begin(), m_container.end(), pos);
+        Type ret = pos->first;
+        p.m_offset = -1;
         m_container.pop_back();
         return ret;
       }
@@ -114,8 +116,9 @@ namespace xpq
         }
         else
         {
+          iterator p = m_container.begin() + pos.m_offset;
           pos.m_container->first = value;
-          adjust_heap(m_container.begin(), m_container.end(), pos.m_position);
+          adjust_heap(m_container.begin(), m_container.end(), p);
         }
       }
 
@@ -123,9 +126,26 @@ namespace xpq
       typedef typename container::iterator iterator;
       typedef typename container::difference_type difference_type;
 
+#if __cplusplus < 201103L
+      inline const Element & move(Element &value)
+      {
+        return value;
+      }
+#else
+      inline Element &&move(Element &value)
+      {
+        return std::move(value);
+      }
+
+      inline Element &&move(Element &&value)
+      {
+        return std::move(value);
+      }
+#endif
+
       void adjust_heap(iterator begin, iterator end, iterator pos)
       {
-        Type tmp = pos->first;
+        Element tmp = move(*pos);
         iterator i;
         for ( ; ; )
         {
@@ -134,7 +154,7 @@ namespace xpq
           iterator right_child = begin + (diff + 1) * 2;
           i = pos;
 
-          if (left_child < end && m_comparer(*left_child, *pos))
+          if (left_child < end && m_comparer(*left_child, tmp))
             i = left_child;
 
           if (right_child < end && m_comparer(*right_child, *i))
@@ -142,41 +162,44 @@ namespace xpq
 
           if (i != pos)
           {
-            pos->first = i->first;
-            pos->second->m_position = pos;
+            *pos = move(*i);
+            pos->second->m_offset = pos - begin;
+            pos = i;
           }
           else
-            return;
+            break;
         }
+        *pos = move(tmp);
+        pos->second->m_offset = pos - begin;
       }
 
       void push_heap(iterator begin, iterator end)
       {
         iterator i = end - 1;
-        Type tmp = i->first;
+        Element tmp = move(*i);
 
         while(i != begin)
         {
           iterator parent = begin + (i - begin - 1) / 2;
-          if (!m_comparer(*i, *parent))
+          if (!m_comparer(tmp, *parent))
             break;
-          i->first = parent->first;
-          i->second->m_position = i;
+          *i = move(*parent);
+          i->second->m_offset = i - begin;
           i = parent;
         }
-        i->first = tmp;
-        i->second->m_position = i;
+        *i = move(tmp);
+        i->second->m_offset = i - begin;
       }
 
-      void heap_pop(iterator begin, iterator end, iterator pos)
+      void pop_heap(iterator begin, iterator end, iterator pos)
       {
         iterator last = end - 1;
-        Type tmp = pos->first;
-        pos->first = last->first;
-        pos->second->m_position = pos;
+        Element tmp = move(*pos);
+        *pos = move(*last);
+        pos->second->m_offset = pos - begin;
         adjust_heap(begin, last, pos);
-        last->first = tmp;
-        last->second->m_position = end;
+        *last = move(tmp);
+        last->second->m_offset = last - begin;
       }
 
       struct comparer_t
