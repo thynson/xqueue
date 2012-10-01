@@ -96,11 +96,24 @@ namespace xpq
       { }
 
       ~xqueue()
-      { }
+      {
+        clear();
+      }
 
       size_type size()
       {
         return m_container.size();
+      }
+
+      bool empty()
+      {
+        return !size();
+      }
+
+      void clear()
+      {
+        for (iterator i = m_container.begin(); i < m_container.end(); ++i)
+          i->second->m_offset = -1;
       }
 
       // Push a value into queue and return its position
