@@ -14,8 +14,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#ifndef __XPQ_HH_INCLUDED__
-#define __XPQ_HH_INCLUDED__
+#ifndef __XQUEUE_HH_INCLUDED__
+#define __XQUEUE_HH_INCLUDED__
 
 #include <functional> // For std::less
 #include <utility>    // For std::pair
