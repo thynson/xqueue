@@ -114,6 +114,7 @@ namespace xq
       {
         for (iterator i = m_container.begin(); i < m_container.end(); ++i)
           i->second->m_offset = -1;
+        m_container.clear();
       }
 
       // Push a value into queue and return its position
