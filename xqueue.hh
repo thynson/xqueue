@@ -125,7 +125,7 @@ namespace xq
         iterator pos = m_container.begin() + p.m_offset;
 
         if (!check_range(m_container.begin(), m_container.end(), pos))
-          throw std::range_error("Position invalid");
+          throw std::range_error("Handle invalid");
 
         pop_heap(m_container.begin(), m_container.end(), pos);
         Type ret = move(pos->first);
