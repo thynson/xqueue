@@ -24,13 +24,6 @@
 
 namespace xq
 {
-  // Forward declarations
-
-  //
-  // Queue: the type of xqueue
-  //
-  template <typename Queue>
-    class position;
 
   //
   //      Type: the value type
@@ -40,38 +33,6 @@ namespace xq
   //            as its template argument
   // Container: template container class, default to std::vector
   //
-  template <typename Type, typename Comparer,
-    template<typename T> class Allocator,
-    template<typename T, typename A> class Container>
-    class xqueue;
-
-  template <typename Type, typename Comparer,
-    template<typename T> class Allocator,
-    template<typename T, typename A> class Container>
-    class position<xqueue<Type, Comparer, Allocator, Container> >
-    {
-    private:
-      typedef xqueue<Type, Comparer, Allocator, Container> Queue;
-      friend class xqueue<Type, Comparer, Allocator, Container>;
-
-    public:
-      position()
-        : m_offset()
-      { }
-
-      ~position()
-      { }
-
-    public:
-
-      typedef typename Queue::container container;
-      typedef typename container::difference_type difference_type;
-      typedef typename container::iterator iterator;
-
-      difference_type m_offset;
-    };
-
-
   template <typename Type,
     typename Comparer = std::less<Type>,
     template<typename T> class Allocator = std::allocator,
@@ -80,14 +41,30 @@ namespace xq
     {
       // Because of the complicated dependency for following defininition,
       // the code have to be splited.
-    private:
-      friend class position<xqueue>;
     public:
-      typedef position<xqueue> position_t;
+      class handle;
     private:
-      typedef std::pair<Type, position_t*> Element;
+      typedef std::pair<Type, handle*> Element;
     public:
+
       typedef Container<Element, Allocator<Element> > container;
+
+      class handle
+      {
+        friend class xqueue;
+      public:
+        typedef typename container::difference_type difference_type;
+        handle()
+          : m_offset()
+        { }
+
+        ~handle()
+        { }
+
+      private:
+        difference_type m_offset;
+      };
+
       typedef typename container::size_type size_type;
 
       xqueue()
@@ -117,16 +94,16 @@ namespace xq
         m_container.clear();
       }
 
-      // Push a value into queue and return its position
-      void push(const Type &value, position_t &pos)
+      // Insert a value into queue and return its position
+      void insert(const Type &value, handle &pos)
       {
         pos.m_offset = m_container.insert(m_container.end(),
-                       make_pair(value, &pos)) - m_container.begin();
+                       Element(value, &pos)) - m_container.begin();
         push_heap(m_container.begin(), m_container.end());
       }
 
       // Return first one in the queue
-      position_t &front()
+      handle &front()
       {
         if (!size())
           throw std::underflow_error("Queue is empty");
@@ -134,7 +111,7 @@ namespace xq
       }
 
       // Extract a value for a given position, and remove it from the queue
-      Type remove(position_t &p)
+      Type remove(handle &p)
       {
         iterator pos = m_container.begin() + p.m_offset;
 
@@ -149,7 +126,7 @@ namespace xq
       }
 
       // Update the value of given position
-      void update(position_t &pos, const Type &value)
+      void update(handle &pos, const Type &value)
       {
         iterator origin = m_container.begin() + pos.m_offset;
 
