@@ -124,28 +124,28 @@ namespace xq
       }
 
       // Extract a value for a given position, and remove it from the queue
-      Type remove(handle &p)
+      Type remove(handle &h)
       {
-        iterator pos = m_container.begin() + p.m_offset;
+        iterator i = m_container.begin() + h.m_offset;
 
-        if (!check_range(m_container.begin(), m_container.end(), pos))
+        if (!check_range(m_container.begin(), m_container.end(), i))
           throw std::range_error("Handle invalid");
 
-        pop_heap(m_container.begin(), m_container.end(), pos);
+        pop_heap(m_container.begin(), m_container.end(), i);
 #if __cplusplus >= 201103L
-        Type ret = std::move(pos->first);
+        Type ret = std::move(i->first);
 #else
-        Type ret = pos->first;
+        Type ret = i->first;
 #endif
-        p.m_offset = -1;
+        h.m_offset = -1;
         m_container.pop_back();
         return ret;
       }
 
       // Update the value of given position
-      void update(handle &pos, const Type &value)
+      void update(handle &h, const Type &value)
       {
-        iterator origin = m_container.begin() + pos.m_offset;
+        iterator origin = m_container.begin() + h.m_offset;
 
         // m_comparer compares Element, while m_comparer.m_comparer
         // compares Type
@@ -165,9 +165,9 @@ namespace xq
 #if __cplusplus >= 201103L
 
       // Update the value of given position
-      void update(handle &pos, Type &&value)
+      void update(handle &h, Type &&value)
       {
-        iterator origin = m_container.begin() + pos.m_offset;
+        iterator origin = m_container.begin() + h.m_offset;
 
         // m_comparer compares Element, while m_comparer.m_comparer
         // compares Type
