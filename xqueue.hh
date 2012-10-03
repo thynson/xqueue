@@ -190,17 +190,12 @@ namespace xq
       typedef typename container::difference_type difference_type;
 
 #if __cplusplus < 201103L
-      inline const Element & move(Element &value)
+      inline const Element &move(Element &value)
       {
         return value;
       }
 #else
       inline Element &&move(Element &value)
-      {
-        return std::move(value);
-      }
-
-      inline Element &&move(Element &&value)
       {
         return std::move(value);
       }
