@@ -55,7 +55,7 @@ namespace xq
       public:
         typedef typename container::difference_type difference_type;
         handle()
-          : m_offset()
+          : m_offset(-1)
         { }
 
         ~handle()
@@ -97,6 +97,8 @@ namespace xq
       // Insert a value into queue and return its position
       void insert(handle &h, const Type &value)
       {
+        if (h.m_offset >= 0)
+          throw std::runtime_error("Handle already used");
         m_container.insert(m_container.end(), Element(value, &h));
         // We don't need to set the m_offset member of the element,
         // as push_heap will do it well.
@@ -106,6 +108,8 @@ namespace xq
       // This will require Type has move constructor
       void insert(handle &h, Type &&value)
       {
+        if (h.m_offset >= 0)
+          throw std::runtime_error("Handle already used");
         m_container.insert(m_container.end(), Element(value, &h));
         push_heap(m_container.begin(), m_container.end());
       }
