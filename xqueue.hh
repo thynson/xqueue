@@ -101,6 +101,14 @@ namespace xq
                        Element(value, &pos)) - m_container.begin();
         push_heap(m_container.begin(), m_container.end());
       }
+#if __cplusplus >= 201103L
+      // This will require Type has move constructor
+      void insert(Type &&value, handle &pos)
+      {
+        pos.m_offset = m_container.insert(m_container.end(),
+                       Element(value, &pos)) - m_container.begin();
+      }
+#endif
 
       // Return first one in the queue
       handle &front()
