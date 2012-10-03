@@ -128,7 +128,11 @@ namespace xq
           throw std::range_error("Handle invalid");
 
         pop_heap(m_container.begin(), m_container.end(), pos);
-        Type ret = move(pos->first);
+#if __cplusplus >= 201103L
+        Type ret = std::move(pos->first);
+#else
+        Type ret = pos->first;
+#endif
         p.m_offset = -1;
         m_container.pop_back();
         return ret;
