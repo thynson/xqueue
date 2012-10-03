@@ -128,7 +128,7 @@ namespace xq
           throw std::range_error("Position invalid");
 
         pop_heap(m_container.begin(), m_container.end(), pos);
-        Type ret = pos->first;
+        Type ret = move(pos->first);
         p.m_offset = -1;
         m_container.pop_back();
         return ret;
