@@ -154,6 +154,29 @@ namespace xq
         // else new value is equals to origin
       }
 
+#if __cplusplus >= 201103L
+
+      // Update the value of given position
+      void update(handle &pos, Type &&value)
+      {
+        iterator origin = m_container.begin() + pos.m_offset;
+
+        // m_comparer compares Element, while m_comparer.m_comparer
+        // compares Type
+        if (m_comparer.m_comparer(value, origin->first))
+        {
+          origin->first = move(value);
+          push_heap(m_container.begin(), origin + 1);
+        }
+        else if (m_comparer.m_comparer(origin->first, value))
+        {
+          origin->first = move(value);
+          adjust_heap(m_container.begin(), m_container.end(), origin);
+        }
+        // else new value is equals to origin
+      }
+#endif
+
     private:
       typedef typename container::iterator iterator;
       typedef typename container::difference_type difference_type;
