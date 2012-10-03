@@ -97,16 +97,17 @@ namespace xq
       // Insert a value into queue and return its position
       void insert(const Type &value, handle &pos)
       {
-        pos.m_offset = m_container.insert(m_container.end(),
-                       Element(value, &pos)) - m_container.begin();
+        m_container.insert(m_container.end(), Element(value, &pos));
+        // We don't need to set the m_offset member of the element,
+        // as push_heap will do it well.
         push_heap(m_container.begin(), m_container.end());
       }
 #if __cplusplus >= 201103L
       // This will require Type has move constructor
       void insert(Type &&value, handle &pos)
       {
-        pos.m_offset = m_container.insert(m_container.end(),
-                       Element(value, &pos)) - m_container.begin();
+        m_container.insert(m_container.end(), Element(value, &pos));
+        push_heap(m_container.begin(), m_container.end());
       }
 #endif
 
