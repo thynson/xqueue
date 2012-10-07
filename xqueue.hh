@@ -28,7 +28,7 @@ namespace xq
   //
   //      Type: the value type
   //  Comparer: comparer for Type
-  // Allocator: template allocator class, for will take
+  // Allocator: template allocator class, will take
   //            std::pair<Type, xpq::position<queue> >
   //            as its template argument
   // Container: template container class, default to std::vector
