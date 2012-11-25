@@ -131,7 +131,7 @@ namespace xq
         if (!check_range(m_container.begin(), m_container.end(), i))
           throw std::range_error("Handle invalid");
 
-        pop_heap(m_container.begin(), m_container.end(), i);
+        i = pop_heap(m_container.begin(), m_container.end(), i);
 #if __cplusplus >= 201103L
         Type ret = std::move(i->first);
 #else
@@ -207,7 +207,7 @@ namespace xq
       }
 
 
-      void adjust_heap(iterator begin, iterator end, iterator pos)
+      iterator adjust_heap(iterator begin, iterator end, iterator pos)
       {
         Element tmp = move(*pos);
         iterator i;
@@ -235,9 +235,10 @@ namespace xq
         }
         *pos = move(tmp);
         pos->second->m_offset = pos - begin;
+        return pos;
       }
 
-      void push_heap(iterator begin, iterator end)
+      iterator push_heap(iterator begin, iterator end)
       {
         iterator i = end - 1;
         Element tmp = move(*i);
@@ -253,9 +254,10 @@ namespace xq
         }
         *i = move(tmp);
         i->second->m_offset = i - begin;
+        return i;
       }
 
-      void pop_heap(iterator begin, iterator end, iterator pos)
+      iterator pop_heap(iterator begin, iterator end, iterator pos)
       {
         iterator last = end - 1;
         Element tmp = move(*pos);
@@ -264,6 +266,7 @@ namespace xq
         adjust_heap(begin, last, pos);
         *last = move(tmp);
         last->second->m_offset = last - begin;
+        return last;
       }
 
       // Wrap Type comparer as Element comparer
