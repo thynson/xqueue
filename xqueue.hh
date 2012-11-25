@@ -28,7 +28,7 @@ namespace xq
   //
   //      Type: the value type
   //  Comparer: comparer for Type
-  // Allocator: template allocator class, for will take
+  // Allocator: template allocator class, will take
   //            std::pair<Type, xpq::position<queue> >
   //            as its template argument
   // Container: template container class, default to std::vector
@@ -146,6 +146,9 @@ namespace xq
       void update(handle &h, const Type &value)
       {
         iterator origin = m_container.begin() + h.m_offset;
+        
+        if (!check_range(m_container.begin(), m_container.end(), origin))
+          throw std::range_error("Handle invalid");
 
         // m_comparer compares Element, while m_comparer.m_comparer
         // compares Type
@@ -169,8 +172,9 @@ namespace xq
       {
         iterator origin = m_container.begin() + h.m_offset;
 
-        // m_comparer compares Element, while m_comparer.m_comparer
-        // compares Type
+        if (!check_range(m_container.begin(), m_container.end(), origin))
+          throw std::range_error("Handle invalid");
+          
         if (m_comparer.m_comparer(value, origin->first))
         {
           origin->first = move(value);
