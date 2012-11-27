@@ -61,6 +61,9 @@ namespace xq
         ~handle()
         { }
 
+        operator bool () const
+        { return m_offset >= 0; }
+
       private:
         difference_type m_offset;
       };
@@ -146,7 +149,7 @@ namespace xq
       void update(handle &h, const Type &value)
       {
         iterator origin = m_container.begin() + h.m_offset;
-        
+
         if (!check_range(m_container.begin(), m_container.end(), origin))
           throw std::range_error("Handle invalid");
 
@@ -174,7 +177,7 @@ namespace xq
 
         if (!check_range(m_container.begin(), m_container.end(), origin))
           throw std::range_error("Handle invalid");
-          
+
         if (m_comparer.m_comparer(value, origin->first))
         {
           origin->first = move(value);
