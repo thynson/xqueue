@@ -226,10 +226,15 @@ namespace xq
           i = pos;
 
           if (left_child < end && m_comparer(*left_child, tmp))
+          {
             i = left_child;
 
-          if (right_child < end && m_comparer(*right_child, *i))
-            i = right_child;
+            if (right_child < end && m_comparer(*right_child, *i))
+              i = right_child;
+          } else {
+            if (right_child < end && m_comparer(*right_child, tmp))
+              i = right_child;
+          }
 
           if (i != pos)
           {
